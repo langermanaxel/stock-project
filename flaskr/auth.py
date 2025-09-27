@@ -50,14 +50,14 @@ def login():
         ).fetchone()
 
         if user is None:
-            error = 'Incorrect username.'
+            error = 'Username is incorrect or is not registered.'
         elif not check_password_hash(user['password'], password):
-            error = 'Incorrect password.'
+            error = 'Username is incorrect or is not registered.'
 
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
 
         flash(error)
 
