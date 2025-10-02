@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Error CSRF{% endblock %}
+{% block header %}<h1>Solicitud inválida</h1>{% endblock %}
+{% block content %}
+  <div class="flash error">Por seguridad, tu solicitud no pudo procesarse (CSRF). {{ reason }}</div>
+  <p>Volvé a intentar desde el formulario.</p>
+{% endblock %}
