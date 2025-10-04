@@ -18,7 +18,7 @@ def _find_user_by_email(db, email: str):
     return db.execute("SELECT id, email FROM user WHERE email = ?", (email,)).fetchone()
 
 def _update_user_password(db, user_id: int, pwd_hash: str):
-    db.execute("UPDATE user SET password = ? WHERE id = ?", (pwd_hash, user_id))
+    db.execute("UPDATE user SET password_hash = ? WHERE id = ?", (pwd_hash, user_id))
     db.commit()
 
 @bp.get("/forgot")

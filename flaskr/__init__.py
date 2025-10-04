@@ -1,19 +1,17 @@
-# flaskr/__init__.py
 import os
 from datetime import timedelta
 from flask import Flask, redirect, url_for, render_template
-from flask_wtf.csrf import CSRFProtect, CSRFError   # ⬅️ nuevo
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_mail import Mail
 
 mail = Mail()
-csrf = CSRFProtect()  # ⬅️ instancia global
+csrf = CSRFProtect()
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
-    # Base
     app.config.from_mapping(
-        SECRET_KEY='dev',  # se sobrescribe abajo/por instancia/ENV
+        SECRET_KEY=os.getenv('SECRET_KEY', 'dev'),
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
 
@@ -22,52 +20,50 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
 
-    # Endurecer sesión + CSRF
     app.config.update(
-        SECRET_KEY=os.getenv('SECRET_KEY', app.config['SECRET_KEY']),
+        # Sesión
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SECURE=False,          # True en PROD con HTTPS
+        SESSION_COOKIE_SECURE=False,          # ⚠️ ponelo en True en PROD con HTTPS
         SESSION_COOKIE_SAMESITE='Lax',
         PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 
-        # Configuración de email
-        SECURITY_PASSWORD_SALT = "otra-sal-separada" , # para tokens
-        MAIL_SERVER = "smtp.gmail.com",
-        MAIL_PORT = 587,
-        MAIL_USE_TLS = True,
-        MAIL_USERNAME = "solomonsilversmith@gmail.com",
-        MAIL_PASSWORD = "Bitcoin123",
-        MAIL_DEFAULT_SENDER = ("StockApp", "solomonsilversmith@gmail.com"),
+        # Tokens (itsdangerous)
+        SECURITY_PASSWORD_SALT=os.getenv('SECURITY_PASSWORD_SALT', 'otra-sal-separada'),
 
-        # Opciones CSRF (Flask-WTF)
+        # Email (Gmail SMTP + App Password)
+        MAIL_SERVER='smtp.gmail.com',
+        MAIL_PORT=587,
+        MAIL_USE_TLS=True,                    # TLS en 587
+        MAIL_USE_SSL=False,           # explícito para no mezclar
+        MAIL_SUPPRESS_SEND=False,     # asegúrate de que no esté True
+        MAIL_DEBUG=True,              # ver mensajes SMTP en consola
+        MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+        MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
+        MAIL_DEFAULT_SENDER=("StockApp", os.getenv('MAIL_USERNAME')),
+
+        # CSRF (Flask-WTF)
         WTF_CSRF_ENABLED=True,
-        WTF_CSRF_TIME_LIMIT=60 * 60 * 2,      # 2 horas (opcional)
-        WTF_CSRF_SSL_STRICT=False,            # True sólo si siempre HTTPS
+        WTF_CSRF_TIME_LIMIT=60*60*2,
+        WTF_CSRF_SSL_STRICT=False,
     )
 
-    # Inicializar email
     mail.init_app(app)
-    # Inicializar CSRF
     csrf.init_app(app)
 
-    # DB
     from . import db
     db.init_app(app)
 
-    # Blueprints
-    from . import auth, index, validate
+    from . import auth, index, validate, users
     app.register_blueprint(auth.bp)
     app.register_blueprint(index.bp)
     app.register_blueprint(validate.bp)
+    app.register_blueprint(users.bp)
 
-    # Raíz -> login
     app.add_url_rule("/", endpoint="root",
                      view_func=lambda: redirect(url_for("auth.login")))
 
-    # Manejo elegante de errores CSRF
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
-        # Podés usar flash y redirigir si preferís
         return (render_template("errors/csrf.html", reason=e.description), 400)
 
     return app
