@@ -3,7 +3,9 @@ import os
 from datetime import timedelta
 from flask import Flask, redirect, url_for, render_template
 from flask_wtf.csrf import CSRFProtect, CSRFError   # ⬅️ nuevo
+from flask_mail import Mail
 
+mail = Mail()
 csrf = CSRFProtect()  # ⬅️ instancia global
 
 def create_app(test_config=None):
@@ -28,12 +30,23 @@ def create_app(test_config=None):
         SESSION_COOKIE_SAMESITE='Lax',
         PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 
+        # Configuración de email
+        SECURITY_PASSWORD_SALT = "otra-sal-separada" , # para tokens
+        MAIL_SERVER = "smtp.gmail.com",
+        MAIL_PORT = 587,
+        MAIL_USE_TLS = True,
+        MAIL_USERNAME = "solomonsilversmith@gmail.com",
+        MAIL_PASSWORD = "Bitcoin123",
+        MAIL_DEFAULT_SENDER = ("StockApp", "solomonsilversmith@gmail.com"),
+
         # Opciones CSRF (Flask-WTF)
         WTF_CSRF_ENABLED=True,
         WTF_CSRF_TIME_LIMIT=60 * 60 * 2,      # 2 horas (opcional)
         WTF_CSRF_SSL_STRICT=False,            # True sólo si siempre HTTPS
     )
 
+    # Inicializar email
+    mail.init_app(app)
     # Inicializar CSRF
     csrf.init_app(app)
 
