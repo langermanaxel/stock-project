@@ -55,9 +55,10 @@ def create_app(test_config=None):
     db.init_app(app)
 
     # Blueprints
-    from . import auth, index
+    from . import auth, index, validate
     app.register_blueprint(auth.bp)
     app.register_blueprint(index.bp)
+    app.register_blueprint(validate.bp)
 
     # Raíz -> login
     app.add_url_rule("/", endpoint="root",

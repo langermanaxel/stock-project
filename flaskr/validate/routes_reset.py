@@ -1,11 +1,18 @@
-# app/auth/routes_reset.py
+# flaskr/validate/routes_reset.py
 from flask import render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash
 from . import bp
-from ..db import get_db  # adapta a como obtienes la conexión
+from ..db import get_db
 from .tokens import generate_reset_token, verify_reset_token
-from flask_mail import Message
-from .. import mail  # importado desde __init__.py donde hiciste mail = Mail()
+
+# Si usás Flask-Mail, asegurate que mail esté inicializado en flaskr/__init__.py
+# y expuesto como 'mail' en el paquete (from . import mail)
+try:
+    from .. import mail
+    from flask_mail import Message
+    _MAIL_ENABLED = True
+except Exception:
+    _MAIL_ENABLED = False
 
 def _find_user_by_email(db, email: str):
     return db.execute("SELECT id, email FROM user WHERE email = ?", (email,)).fetchone()
@@ -16,6 +23,7 @@ def _update_user_password(db, user_id: int, pwd_hash: str):
 
 @bp.get("/forgot")
 def forgot_password_form():
+    # → templates/validate/forgot_password.html
     return render_template("auth/forgot_password.html")
 
 @bp.post("/forgot")
@@ -24,31 +32,39 @@ def forgot_password_submit():
     db = get_db()
     user = _find_user_by_email(db, email)
 
-    # Mensaje genérico SIEMPRE (no revelar existencia)
+    # Mensaje neutro siempre
     flash("Si el email está registrado, te enviamos instrucciones.", "info")
 
     if user:
         token = generate_reset_token(user["id"])
+        # Usa endpoint del mismo blueprint
         reset_url = url_for("validate.reset_password_form", token=token, _external=True)
 
-        # Opción A: enviar email real
-        try:
-            msg = Message(subject="Restablecer contraseña",
-                          recipients=[email],
-                          body=f"Para restablecer tu contraseña, hacé clic: {reset_url}\n\nEste enlace expira en 1 hora.")
-            mail.send(msg)
-        except Exception:
-            # Opción B: en desarrollo, registrá el link en logs o consola
+        if _MAIL_ENABLED:
+            try:
+                msg = Message(
+                    subject="Restablecer contraseña",
+                    recipients=[email],
+                    body=f"Para restablecer tu contraseña, hacé clic: {reset_url}\n\nEste enlace expira en 1 hora."
+                )
+                mail.send(msg)
+            except Exception:
+                print("LINK DE RECUPERACIÓN:", reset_url)
+        else:
+            # Entorno desarrollo (sin Mail)
             print("LINK DE RECUPERACIÓN:", reset_url)
 
-    return redirect(url_for("auth.login"))  # o mostrar una página de confirmación
+    # Volvé al login del blueprint 'auth' (si tu login está ahí)
+    return redirect(url_for("auth.login"))
 
 @bp.get("/reset/<token>")
 def reset_password_form(token):
     user_id = verify_reset_token(token)
     if not user_id:
         flash("El enlace no es válido o expiró.", "warning")
-        return redirect(url_for("auth.forgot_password_form"))
+        # Ojo: acá era 'auth.forgot_password_form'; debe ser validate
+        return redirect(url_for("validate.forgot_password_form"))
+    # → templates/validate/reset_password.html
     return render_template("auth/reset_password.html", token=token)
 
 @bp.post("/reset/<token>")
@@ -61,7 +77,6 @@ def reset_password_submit(token):
     pwd = request.form.get("password", "")
     pwd2 = request.form.get("password2", "")
 
-    # Validaciones mínimas
     if len(pwd) < 8 or pwd != pwd2:
         flash("La contraseña debe tener al menos 8 caracteres y coincidir.", "danger")
         return redirect(url_for("validate.reset_password_form", token=token))
