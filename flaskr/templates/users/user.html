@@ -1,11 +1,55 @@
+{# templates/rols/user.html #}
 {% extends 'base.html' %}
 
-{% block title %}User Panel{% endblock %}
+{% block title %}Panel de Usuario · StockApp{% endblock %}
 
 {% block header %}
-  <h1>Bienvenido a StockApp</h1>
+  <h1>Panel de Usuario</h1>
+  <p class="text-muted">
+    Hola {{ g.user['firstname'] or g.user['username'] }}, bienvenido a tu espacio personal.
+  </p>
 {% endblock %}
 
 {% block content %}
-  <p>Esta es el panel de usuario.</p>
+
+  {# Mensajes flash #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-group">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <section class="user-actions">
+    <ul class="cards">
+      <li class="card">
+        <h3>Mis Ventas</h3>
+        <p>Registrá o consultá tus ventas recientes.</p>
+        <a href="{{ url_for('sales.user_sales') }}">Ver ventas</a>
+      </li>
+      <li class="card">
+        <h3>Stock Disponible</h3>
+        <p>Revisá productos y existencias actuales.</p>
+        <a href="{{ url_for('stock.list') }}">Ver stock</a>
+      </li>
+      <li class="card">
+        <h3>Mis Datos</h3>
+        <p>Actualizá tu perfil o cambiá tu contraseña.</p>
+        <a href="{{ url_for('users.perfil') }}">Editar perfil</a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="summary">
+    <h2>Resumen rápido</h2>
+    <ul class="stats">
+      <li><strong>{{ today_sales_count or 0 }}</strong><span>Ventas de hoy</span></li>
+      <li><strong>{{ total_sales or 0 }}</strong><span>Ventas totales</span></li>
+      <li><strong>{{ low_stock_count or 0 }}</strong><span>Productos con bajo stock</span></li>
+    </ul>
+  </section>
+
 {% endblock %}

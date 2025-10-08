@@ -1,11 +1,66 @@
 import sqlite3
-from flask import Blueprint, flash, redirect, render_template, request, url_for, session, g
 import functools
+from flask import (
+    Blueprint, flash, redirect, render_template,
+    request, url_for, session, g
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 from flaskr.db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+
+# ----------------------------
+# Helpers / Decoradores
+# ----------------------------
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            flash('Tenés que iniciar sesión.', 'error')
+            return redirect(url_for('auth.login'))
+        return view(**kwargs)
+    return wrapped_view
+
+
+def roles_required(*roles):
+    """
+    Restringe el acceso a usuarios cuyo g.user['role'] esté en `roles`.
+    Uso:
+        @roles_required('ADMIN')
+        @roles_required('USER', 'ADMIN')
+    """
+    def decorator(view):
+        @functools.wraps(view)
+        def wrapped_view(**kwargs):
+            if g.user is None:
+                flash('Tenés que iniciar sesión.', 'error')
+                return redirect(url_for('auth.login'))
+            if g.user['role'] not in roles:
+                flash('Acceso denegado.', 'error')
+                # Cambiá 'main.index' por la home real de tu app
+                return redirect(url_for('main.index'))
+            return view(**kwargs)
+        return wrapped_view
+    return decorator
+
+
+@bp.before_app_request
+def load_logged_in_user():
+    """Carga g.user desde la sesión si hay user_id."""
+    user_id = session.get('user_id')
+    if user_id is None:
+        g.user = None
+    else:
+        g.user = get_db().execute(
+            'SELECT * FROM user WHERE id = ?',
+            (user_id,)
+        ).fetchone()
+
+
+# ----------------------------
+# Registro
+# ----------------------------
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
@@ -19,7 +74,7 @@ def register():
 
         error = None
 
-        # Validaciones del lado servidor (siempre necesarias)
+        # Validaciones del lado servidor
         if not all([firstname, lastname, email, username, password, confirm_password]):
             error = 'Todos los campos son obligatorios.'
         elif len(password) < 8:
@@ -32,6 +87,8 @@ def register():
         if error is None:
             db = get_db()
             try:
+                # Importante: NO permitimos fijar role desde el form público.
+                # Queda en DEFAULT 'USER' definido en el schema.
                 db.execute(
                     """
                     INSERT INTO user (firstname, lastname, email, username, password_hash)
@@ -41,11 +98,11 @@ def register():
                 )
                 db.commit()
             except sqlite3.IntegrityError as e:
-                # Distinguir violaciones de UNIQUE por columna
+                # Manejo robusto de UNIQUE
                 msg = str(e)
-                if 'user.username' in msg:
+                if 'user.username' in msg or 'UNIQUE constraint failed: user.username' in msg:
                     error = 'Ese nombre de usuario ya está en uso.'
-                elif 'user.email' in msg:
+                elif 'user.email' in msg or 'UNIQUE constraint failed: user.email' in msg:
                     error = 'Ese correo ya está registrado.'
                 else:
                     error = 'No se pudo completar el registro.'
@@ -58,61 +115,60 @@ def register():
     return render_template('auth/register.html')
 
 
+# ----------------------------
+# Login
+# ----------------------------
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
-        # Normalizar entradas
         username = (request.form.get('username') or '').strip()
         password = request.form.get('password') or ''
 
         error = None
+        user = None
+
         if not username or not password:
             error = 'Ingresá tu usuario y contraseña.'
         else:
             db = get_db()
-            # Si querés case-insensitive para username, podés agregar "COLLATE NOCASE" en la consulta
+            # Búsqueda case-insensitive (si el schema no tiene COLLATE NOCASE en username, esto lo cubre)
             user = db.execute(
-                'SELECT * FROM user WHERE username = ?',
+                "SELECT * FROM user WHERE username = ? COLLATE NOCASE",
                 (username,)
             ).fetchone()
 
+            # Mensaje genérico para no filtrar existencia del usuario
             if user is None or not check_password_hash(user['password_hash'], password):
-                # Mensaje genérico para no revelar si el usuario existe
                 error = 'Usuario o contraseña incorrectos.'
 
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            # Redirigir a una vista real (por ejemplo, home del app)
-            return redirect(url_for('main.index'))  # ajustá al endpoint que quieras
+
+            # Guardar último acceso
+            db = get_db()
+            db.execute(
+                "UPDATE user SET last_login_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?",
+                (user['id'],)
+            )
+            db.commit()
+
+            # Redirección opcional según rol
+            if user['role'] == 'ADMIN':
+                # Cambiá 'users.admin_panel' si tu endpoint difiere
+                return redirect(url_for('users.admin_panel'))
+            # Cambiá 'main.index' por el dashboard/home real
+            return redirect(url_for('main.index'))
 
         flash(error, 'error')
 
     return render_template('auth/login.html')
 
 
-@bp.before_app_request
-def load_logged_in_user():
-    user_id = session.get('user_id')
-    if user_id is None:
-        g.user = None
-    else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?',
-            (user_id,)
-        ).fetchone()
-
-
+# ----------------------------
+# Logout
+# ----------------------------
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('auth.login'))  # ajustá al endpoint post-logout
-
-
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-    return wrapped_view
+    return redirect(url_for('auth.login'))
