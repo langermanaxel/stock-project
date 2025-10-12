@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Consultar Stock{% endblock %}
+
+{% block header %}
+  <h1>Consultar Stock</h1>
+{% endblock %}
+
+{% block content %}
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Categoría</th>
+        <th>Stock actual</th>
+        <th>Precio de venta</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in productos %}
+      <tr>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.categoria }}</td>
+        <td>{{ p.stock_actual }}</td>
+        <td>${{ "%.2f"|format(p.precio_venta) }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">No hay productos cargados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

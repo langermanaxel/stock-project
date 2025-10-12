@@ -1,4 +1,4 @@
-{# templates/rols/user.html #}
+{# templates/users/user.html #}
 {% extends 'base.html' %}
 
 {% block title %}Panel de Usuario · StockApp{% endblock %}
@@ -6,50 +6,24 @@
 {% block header %}
   <h1>Panel de Usuario</h1>
   <p class="text-muted">
-    Hola {{ g.user['firstname'] or g.user['username'] }}, bienvenido a tu espacio personal.
+    Hola {{ g.user['firstname'] or g.user['username'] }}, gestioná tus ventas y consultá el stock disponible.
   </p>
 {% endblock %}
 
 {% block content %}
-
-  {# Mensajes flash #}
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-group">
-        {% for category, message in messages %}
-          <div class="flash flash-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
   <section class="user-actions">
     <ul class="cards">
       <li class="card">
-        <h3>Mis Ventas</h3>
-        <p>Registrá o consultá tus ventas recientes.</p>
-        <a href="{{ url_for('sales.user_sales') }}">Ver ventas</a>
+        <h3>Registrar Venta</h3>
+        <p>Cargá las ventas diarias con los productos vendidos.</p>
+        <a href="{{ url_for('sales.carry') }}" class="btn">Cargar venta</a>
       </li>
+
       <li class="card">
-        <h3>Stock Disponible</h3>
-        <p>Revisá productos y existencias actuales.</p>
-        <a href="{{ url_for('stock.list') }}">Ver stock</a>
-      </li>
-      <li class="card">
-        <h3>Mis Datos</h3>
-        <p>Actualizá tu perfil o cambiá tu contraseña.</p>
-        <a href="{{ url_for('users.perfil') }}">Editar perfil</a>
+        <h3>Consultar Stock</h3>
+        <p>Revisá el inventario actual y los precios de productos.</p>
+        <a href="{{ url_for('stock.consult') }}" class="btn">Ver stock</a>
       </li>
     </ul>
   </section>
-
-  <section class="summary">
-    <h2>Resumen rápido</h2>
-    <ul class="stats">
-      <li><strong>{{ today_sales_count or 0 }}</strong><span>Ventas de hoy</span></li>
-      <li><strong>{{ total_sales or 0 }}</strong><span>Ventas totales</span></li>
-      <li><strong>{{ low_stock_count or 0 }}</strong><span>Productos con bajo stock</span></li>
-    </ul>
-  </section>
-
 {% endblock %}
