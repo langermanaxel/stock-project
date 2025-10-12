@@ -1,0 +1,86 @@
+# ===========================
+# 🐍 FLASK / PYTHON PROJECTS
+# ===========================
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Archivos de entorno / configuración local
+.env
+.env.local
+*.env
+
+# Archivos de base de datos locales o runtime
+instance/
+*.sqlite3
+*.db
+*.db-journal
+
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de test y coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Compilación y distribución
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs y dumps
+*.log
+*.out
+*.err
+*.pid
+
+# IDEs / editores
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Archivos de empaquetado / Docker / CI opcionales
+*.bak
+*.old
+*.orig
+*.tmp
+*.backup
+*.lock
+
+# ==================================
+# 🧩 FLASK-SPECIFIC / APP STRUCTURE
+# ==================================
+
+# Flask instance folder (runtime)
+instance/
+
+# Flask migrations (si usás Flask-Migrate)
+migrations/
+
+# Configs locales
+config.dev.py
+config.local.py
+config.py.save
+
+# ===========================
+# 🧠 PERSONAL PREFERENCES
+# ===========================
+# CSVs temporales / data dumps
+*.csv
+*.xlsx
+*.ods
+
+# Archivos privados
+secrets.json
+*.pem
+*.key
