@@ -14,7 +14,7 @@ def consult():
 @roles_required("ADMIN")
 def list():
     rows = get_db().execute("SELECT id, nombre, categoria, stock_actual, precio_venta FROM producto ORDER BY nombre").fetchall()
-    return render_template("stock/list.html", productos=rows)
+    return render_template("stock/consult.html", productos=rows)
 
 @bp.route("/new", methods=["GET","POST"])
 @roles_required("ADMIN")
@@ -28,5 +28,5 @@ def new():
                    (nombre, categoria, 0, precio))
         db.commit()
         flash("Producto creado.", "success")
-        return redirect(url_for("stock.list"))
+        return redirect(url_for("stock.consult"))
     return render_template("stock/form.html", mode="new")

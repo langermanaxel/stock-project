@@ -12,8 +12,8 @@
         <li><a href="{{ url_for('users.admin_panel') }}">Admin</a></li>
         <a href="{{ url_for('users.manage') }}">Usuarios</a>
         <a href="{{ url_for('stock.list') }}">Stock</a>
-        <a href="{{ url_for('compras.list') }}">Compras</a>
-        <a href="{{ url_for('ventas.list') }}">Ventas</a>
+        <a href="{{ url_for('shopping.list') }}">Compras</a>
+        <a href="{{ url_for('sales.list') }}">Ventas</a>
         <a href="{{ url_for('reports.index') }}">Reportes</a>
       {% endif %}
       <li><a href="{{ url_for('users.perfil') }}">{{ g.user['username'] }}</a></li>

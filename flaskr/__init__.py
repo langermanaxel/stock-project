@@ -53,13 +53,15 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    from . import auth, index, validate, users, sales, stock
+    from . import auth, index, validate, users, sales, stock, shopping, reports
     app.register_blueprint(auth.bp)
     app.register_blueprint(index.bp)
     app.register_blueprint(validate.bp)
     app.register_blueprint(users.bp)
     app.register_blueprint(sales.bp)
+    app.register_blueprint(shopping.bp)
     app.register_blueprint(stock.bp)
+    app.register_blueprint(reports.bp)
 
     app.add_url_rule("/", endpoint="root",
                      view_func=lambda: redirect(url_for("auth.login")))

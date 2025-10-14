@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Compras{% endblock %}
+
+{% block header %}
+  <h1>Listado de Compras</h1>
+{% endblock %}
+
+{% block content %}
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Proveedor</th><th>Fecha</th><th>Total</th></tr>
+    </thead>
+    <tbody>
+      {% for c in compras %}
+      <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.proveedor }}</td>
+        <td>{{ c.fecha }}</td>
+        <td>${{ "%.2f"|format(c.total) }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">Sin compras registradas.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

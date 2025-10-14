@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Ventas{% endblock %}
+
+{% block header %}
+  <h1>Listado de Ventas</h1>
+{% endblock %}
+
+{% block content %}
+  <section>
+    <p>Esta es la sección de ventas.</p>
+    {% if ventas %}
+      <ul>
+        {% for v in ventas %}
+          <li>Venta #{{ v['id'] }} — Fecha: {{ v['fecha'] }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay ventas registradas aún.</p>
+    {% endif %}
+  </section>
+{% endblock %}

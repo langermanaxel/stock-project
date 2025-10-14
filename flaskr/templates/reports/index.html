@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block header %}
+  <h1>Panel de Reportes</h1>
+{% endblock %}
+
+{% block content %}
+  <section>
+    <h2>Resumen general</h2>
+    <ul>
+      <li>Total de productos: {{ ventas_hoy }}</li>
+      <li>Total de ventas: {{ top5 }}</li>
+    </ul>
+  </section>
+{% endblock %}
