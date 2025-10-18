@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock · Panel de Administración{% endblock %}
+
+{% block header %}
+  <h1>Gestión de Stock</h1>
+{% endblock %}
+
+{% block content %}
+  <section class="stock-panel">
+    <div class="toolbar">
+      <a href="{{ url_for('stock.create') }}" class="btn btn-primary">➕ Nuevo producto</a>
+    </div>
+
+    {% if productos %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Stock</th>
+            <th>Precio Compra</th>
+            <th>Precio Venta</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in productos %}
+          <tr>
+            <td>{{ p['id'] }}</td>
+            <td>{{ p['producto'] }}</td>
+            <td>{{ p['categoria'] or '–' }}</td>
+            <td>{{ p['stock_actual'] }}</td>
+            <td>${{ '%.2f'|format(p['precio_compra']) }}</td>
+            <td>${{ '%.2f'|format(p['precio_venta']) }}</td>
+            <td>
+              <a href="{{ url_for('stock.edit', id=p['id']) }}" class="btn btn-sm btn-warning">Editar</a>
+              <a href="{{ url_for('stock.delete', id=p['id']) }}" class="btn btn-sm btn-danger"
+                 onclick="return confirm('¿Seguro que deseas eliminar este producto?');">Eliminar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No hay productos registrados aún.</p>
+    {% endif %}
+  </section>
+{% endblock %}

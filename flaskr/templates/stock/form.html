@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {% if mode == 'edit' %}Editar producto{% else %}Nuevo producto{% endif %}
+{% endblock %}
+
+{% block header %}
+  <h1>
+    {% if mode == 'edit' %}Editar producto{% else %}Nuevo producto{% endif %}
+  </h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post" class="form-container">
+    <div class="form-group">
+      <label for="nombre">Nombre del producto</label>
+      <input type="text" name="nombre" id="nombre" required
+             value="{{ producto['nombre'] if producto else '' }}">
+    </div>
+
+    <div class="form-group">
+      <label for="categoria">Categoría</label>
+      <input type="text" name="categoria" id="categoria"
+             value="{{ producto['categoria'] if producto else '' }}">
+    </div>
+
+    <div class="form-group">
+      <label for="precio_compra">Precio de compra</label>
+      <input type="number" step="0.01" name="precio_compra" id="precio_compra"
+             value="{{ producto['precio_compra'] if producto else '' }}">
+    </div>
+
+    <div class="form-group">
+      <label for="precio_venta">Precio de venta</label>
+      <input type="number" step="0.01" name="precio_venta" id="precio_venta"
+             value="{{ producto['precio_venta'] if producto else '' }}">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if mode == 'edit' %}Guardar cambios{% else %}Crear producto{% endif %}
+      </button>
+      <a href="{{ url_for('stock.list') }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+{% endblock %}

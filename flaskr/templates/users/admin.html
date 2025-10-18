@@ -1,16 +1,44 @@
+{# templates/users/admin.html #}
 {% extends 'base.html' %}
-{% block title %}Admin · StockApp{% endblock %}
+
+{% block title %}Panel de Administración · StockApp{% endblock %}
+
 {% block header %}
   <h1>Panel de Administración</h1>
+  <p class="text-muted">
+    ¡Hola! {{ g.user['firstname'] or g.user['username'] }} tiene acceso total a las áreas de gestión y control del sistema.
+  </p>
 {% endblock %}
+
 {% block content %}
-  <ul class="cards">
-    <li class="card"><h3>Usuarios</h3><a href="{{ url_for('users.manage') }}">Administrar</a></li>
-    <li class="card"><h3>Stock</h3><a href="{{ url_for('stock.list') }}">Productos</a></li>
-    <li class="card"><h3>Compras</h3><a href="{{ url_for('compras.list') }}">Ver compras</a></li>
-    <li class="card"><h3>Ventas</h3><a href="{{ url_for('ventas.list') }}">Ver ventas</a></li>
-    <li class="card"><h3>Reportes</h3><a href="{{ url_for('reports.index') }}">Estadísticas</a></li>
-  </ul>
+  <section class="user-actions">
+    <ul class="cards">
+      <li class="card">
+        <h3>Usuarios</h3>
+        <a href="{{ url_for('users.manage') }}" class="btn">Administrar</a>
+      </li>
+
+      <li class="card">
+        <h3>Stock</h3>
+        <a href="{{ url_for('stock.list') }}" class="btn">Productos</a>
+      </li>
+
+      <li class="card">
+        <h3>Compras</h3>
+        <a href="{{ url_for('shopping.list') }}" class="btn">Ver compras</a>
+      </li>
+
+      <li class="card">
+        <h3>Ventas</h3>
+        <a href="{{ url_for('sales.list') }}" class="btn">Ver ventas</a>
+      </li>
+
+      <li class="card">
+        <h3>Reportes</h3>
+        <a href="{{ url_for('reports.index') }}" class="btn">Estadísticas</a>
+      </li>
+    </ul>
+  </section>
   <div class="stats">
     <div>Total usuarios: {{ total_users }}</div>
     <div>Admins: {{ admins }}</div>

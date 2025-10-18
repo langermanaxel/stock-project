@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar producto{% endblock %}
+
+{% block header %}
+  <h1>Eliminar producto</h1>
+{% endblock %}
+
+{% block content %}
+  <div class="delete-confirm">
+    <p>¿Seguro que deseas eliminar el producto <strong>{{ producto['nombre'] }}</strong>?</p>
+
+    <form method="post">
+      <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+      <a href="{{ url_for('stock.list') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+{% endblock %}
