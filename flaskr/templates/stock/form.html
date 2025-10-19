@@ -13,27 +13,33 @@
 {% block content %}
   <form method="post" class="form-container">
     <div class="form-group">
-      <label for="nombre">Nombre del producto</label>
-      <input type="text" name="nombre" id="nombre" required
-             value="{{ producto['nombre'] if producto else '' }}">
+      <label for="name">Nombre del producto</label>
+      <input type="text" name="name" id="name" required
+             value="{{ producto['name'] if producto else '' }}">
     </div>
 
     <div class="form-group">
-      <label for="categoria">Categoría</label>
-      <input type="text" name="categoria" id="categoria"
-             value="{{ producto['categoria'] if producto else '' }}">
+      <label for="category">Categoría</label>
+      <input type="text" name="category" id="category"
+             value="{{ producto['category'] if producto else '' }}">
     </div>
 
     <div class="form-group">
-      <label for="precio_compra">Precio de compra</label>
-      <input type="number" step="0.01" name="precio_compra" id="precio_compra"
-             value="{{ producto['precio_compra'] if producto else '' }}">
+      <label for="current_stock">Stock actual</label>
+      <input type="number" min="0" name="current_stock" id="current_stock"
+             value="{{ producto['current_stock'] if producto else 0 }}">
     </div>
 
     <div class="form-group">
-      <label for="precio_venta">Precio de venta</label>
-      <input type="number" step="0.01" name="precio_venta" id="precio_venta"
-             value="{{ producto['precio_venta'] if producto else '' }}">
+      <label for="purchase_price">Precio de compra</label>
+      <input type="number" step="0.01" min="0" name="purchase_price" id="purchase_price"
+             value="{{ producto['purchase_price'] if producto else '' }}">
+    </div>
+
+    <div class="form-group">
+      <label for="sale_price">Precio de venta</label>
+      <input type="number" step="0.01" min="0" name="sale_price" id="sale_price"
+             value="{{ producto['sale_price'] if producto else '' }}">
     </div>
 
     <div class="form-actions">

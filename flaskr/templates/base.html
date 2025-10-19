@@ -1,28 +1,39 @@
 <!doctype html>
-<title>{% block title %}{% endblock %} - Flaskr</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<nav>
-  <h1><a href="{{ url_for('main.index') }}">StockApp</a></h1>
-  <ul>
-    {% if g.user %}
-      {% if g.user['role'] == 'ADMIN' %}
-        <li><a href="{{ url_for('users.admin_panel') }}">{{ g.user['username'] }}</a></li>
-      {% else %}
-        <li><a href="{{ url_for('users.perfil') }}">{{ g.user['username'] }}</a></li>
-      {% endif %}
-      <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-    {% else %}
-      <li><a href="{{ url_for('auth.register') }}">Register</a></li>
-      <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
-    {% endif %}
-  </ul>
-</nav>
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} - StockApp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+
+  <body>
+    <nav>
+      <h1><a href="{{ url_for('main.index') }}">StockApp</a></h1>
+      <ul>
+        {% if g.user %}
+          {% if g.user.get('role') == 'ADMIN' %}
+            <li><a href="{{ url_for('users.admin_panel') }}">{{ g.user.get('username', 'Admin') }}</a></li>
+          {% else %}
+            <li><a href="{{ url_for('users.perfil') }}">{{ g.user.get('username', 'Usuario') }}</a></li>
+          {% endif %}
+          <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+        {% else %}
+          <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+          <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <section class="content">
+      <header>
+        {% block header %}{% endblock %}
+      </header>
+
+      {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+
+      {% block content %}{% endblock %}
+    </section>
+  </body>
+</html>

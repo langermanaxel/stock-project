@@ -29,11 +29,11 @@
           {% for p in productos %}
           <tr>
             <td>{{ p['id'] }}</td>
-            <td>{{ p['producto'] }}</td>
-            <td>{{ p['categoria'] or '–' }}</td>
-            <td>{{ p['stock_actual'] }}</td>
-            <td>${{ '%.2f'|format(p['precio_compra']) }}</td>
-            <td>${{ '%.2f'|format(p['precio_venta']) }}</td>
+            <td>{{ p['name'] }}</td>
+            <td>{{ p['category'] or '–' }}</td>
+            <td>{{ p['current_stock'] }}</td>
+            <td>${{ '%.2f'|format(p['purchase_price']) }}</td>
+            <td>${{ '%.2f'|format(p['sale_price']) }}</td>
             <td>
               <a href="{{ url_for('stock.edit', id=p['id']) }}" class="btn btn-sm btn-warning">Editar</a>
               <a href="{{ url_for('stock.delete', id=p['id']) }}" class="btn btn-sm btn-danger"

@@ -15,8 +15,8 @@ def consult():
     """
     db = get_db()
     productos = db.execute(
-        "SELECT id, nombre, categoria, stock_actual, precio_venta "
-        "FROM producto ORDER BY nombre"
+        "SELECT id, name, category, current_stock, sale_price "
+        "FROM product ORDER BY name"
     ).fetchall()
     return render_template('stock/consult.html', productos=productos)
 
@@ -31,43 +31,45 @@ def list():
     """
     db = get_db()
     productos = db.execute(
-        "SELECT id, nombre, categoria, stock_actual, precio_venta, precio_compra "
-        "FROM producto ORDER BY nombre"
+        "SELECT id, name, category, current_stock, sale_price, purchase_price "
+        "FROM product ORDER BY name"
     ).fetchall()
     return render_template("stock/list.html", productos=productos)
 
 
-# ➕ 3️⃣ Crear nuevo producto (solo ADMIN)
 @bp.route("/new", methods=["GET", "POST"])
 @roles_required("ADMIN")
 def create():
-    """
-    Permite al ADMIN crear un nuevo producto.
-    """
+    """Permite al ADMIN crear un nuevo producto."""
     if request.method == "POST":
-        nombre = request.form["nombre"].strip()
-        categoria = request.form.get("categoria", "").strip()
-        precio_venta = float(request.form.get("precio_venta", "0") or 0)
-        precio_compra = float(request.form.get("precio_compra", "0") or 0)
+        name = request.form["name"].strip()
+        category = request.form.get("category", "").strip()
+        current_stock = int(request.form.get("current_stock", "0") or 0)
+        sale_price = float(request.form.get("sale_price", "0") or 0)
+        purchase_price = float(request.form.get("purchase_price", "0") or 0)
 
         db = get_db()
         db.execute(
-            "INSERT INTO products (nombre, categoria, stock_actual, precio_compra, precio_venta) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (nombre, categoria, 0, precio_compra, precio_venta),
+            """
+            INSERT INTO product (name, category, current_stock, sale_price, purchase_price)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (name, category, current_stock, sale_price, purchase_price),
         )
         db.commit()
+
         flash("✅ Producto creado con éxito.", "success")
         return redirect(url_for("stock.list"))
 
     return render_template("stock/form.html", mode="new")
+
 
 # ✏️ Editar producto
 @bp.route("/edit/<int:id>", methods=["GET", "POST"])
 @roles_required("ADMIN")
 def edit(id):
     db = get_db()
-    producto = db.execute("SELECT * FROM producto WHERE id = ?", (id,)).fetchone()
+    producto = db.execute("SELECT * FROM product WHERE id = ?", (id,)).fetchone()
 
     if producto is None:
         flash("❌ Producto no encontrado.", "error")
@@ -80,8 +82,8 @@ def edit(id):
         precio_venta = float(request.form.get("precio_venta", "0") or 0)
 
         db.execute("""
-            UPDATE products
-            SET nombre = ?, categoria = ?, precio_compra = ?, precio_venta = ?
+            UPDATE product
+            SET name = ?, category = ?, sale_price = ?, purchase_price = ?
             WHERE id = ?
         """, (nombre, categoria, precio_compra, precio_venta, id))
         db.commit()
@@ -97,14 +99,14 @@ def edit(id):
 @roles_required("ADMIN")
 def delete(id):
     db = get_db()
-    producto = db.execute("SELECT * FROM producto WHERE id = ?", (id,)).fetchone()
+    producto = db.execute("SELECT * FROM product WHERE id = ?", (id,)).fetchone()
 
     if producto is None:
         flash("❌ Producto no encontrado.", "error")
         return redirect(url_for("stock.list"))
 
     if request.method == "POST":
-        db.execute("DELETE FROM products WHERE id = ?", (id,))
+        db.execute("DELETE FROM product WHERE id = ?", (id,))
         db.commit()
         flash("🗑️ Producto eliminado correctamente.", "success")
         return redirect(url_for("stock.list"))

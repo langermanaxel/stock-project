@@ -1,7 +1,21 @@
 {% extends "base.html" %}
-{% block title %}Error CSRF{% endblock %}
-{% block header %}<h1>Solicitud inválida</h1>{% endblock %}
+{% block title %}Error de seguridad{% endblock %}
+
+{% block header %}
+  <h1>⚠️ Solicitud no válida</h1>
+{% endblock %}
+
 {% block content %}
-  <div class="flash error">Por seguridad, tu solicitud no pudo procesarse (CSRF). {{ reason }}</div>
-  <p>Volvé a intentar desde el formulario.</p>
+  <div class="flash error">
+    <p><strong>Por seguridad, tu solicitud no pudo procesarse.</strong></p>
+    <p>{{ reason or "El token CSRF es inválido o expiró." }}</p>
+  </div>
+
+  {% if g.user %}
+    <p>Podés volver al panel principal:</p>
+    <a href="{{ url_for('main.index') }}" class="btn">🏠 Volver al inicio</a>
+  {% else %}
+    <p>Tu sesión pudo haber expirado. Iniciá sesión nuevamente:</p>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">🔑 Iniciar sesión</a>
+  {% endif %}
 {% endblock %}

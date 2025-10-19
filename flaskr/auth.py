@@ -45,22 +45,27 @@ def roles_required(*roles):
     return decorator
 
 
+from flask import g, session
+from flaskr.db import get_db
+
 @bp.before_app_request
 def load_logged_in_user():
-    """Carga g.user desde la sesión si hay user_id."""
+    """Carga g.user desde la sesión si hay user_id. Tolerante a errores."""
     user_id = session.get("user_id")
 
+    # Si no hay sesión activa, g.user = None
     if user_id is None:
         g.user = None
-    else:
-        db = get_db()
-        row = db.execute(
-            "SELECT * FROM user WHERE id = ?",
-            (user_id,)
-        ).fetchone()
+        return
 
-        # ✅ Convertir Row → dict para poder usar .get() en toda la app
+    try:
+        db = get_db()
+        row = db.execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
         g.user = dict(row) if row else None
+    except Exception as e:
+        # Previene que errores de DB rompan la sesión
+        g.user = None
+
 
 
 
