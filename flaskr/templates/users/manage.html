@@ -15,6 +15,7 @@
       <td>{{ u.username }}</td>
       <td>
         <form method="post" action="{{ url_for('users.set_role', user_id=u.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <select name="role" onchange="this.form.submit()">
             <option value="USER"  {{ 'selected' if u.role=='USER' else '' }}>USER</option>
             <option value="ADMIN" {{ 'selected' if u.role=='ADMIN' else '' }}>ADMIN</option>
@@ -24,6 +25,7 @@
       <td>{{ u.status }}</td>
       <td>
         <form method="post" action="{{ url_for('users.toggle_status', user_id=u.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit">
             {{ 'Suspender' if u.status=='ACTIVE' else 'Reactivar' }}
           </button>

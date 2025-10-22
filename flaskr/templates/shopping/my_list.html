@@ -1,8 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Listado de compras{% endblock %}
+
+{% block title %}Mis compras{% endblock %}
+
 {% block header %}
-  <h1>Historial de compras</h1>
+  <h1>Mis compras</h1>
 {% endblock %}
+
 {% block content %}
   {% if compras %}
     <table class="table">
@@ -14,7 +17,6 @@
           <th>Precio unitario</th>
           <th>Total</th>
           <th>Fecha</th>
-          <th>Registrado por</th>
         </tr>
       </thead>
       <tbody>
@@ -26,12 +28,11 @@
             <td>${{ "%.2f"|format(c.unit_price) }}</td>
             <td>${{ "%.2f"|format(c.total_price) }}</td>
             <td>{{ c.purchase_date[:10] }}</td>
-            <td>{{ c.created_by or "—" }}</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   {% else %}
-    <p>No hay compras registradas.</p>
+    <p>No registraste compras todavía.</p>
   {% endif %}
 {% endblock %}

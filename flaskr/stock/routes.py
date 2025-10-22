@@ -76,10 +76,10 @@ def edit(id):
         return redirect(url_for("stock.list"))
 
     if request.method == "POST":
-        nombre = request.form["nombre"].strip()
-        categoria = request.form.get("categoria", "").strip()
-        precio_compra = float(request.form.get("precio_compra", "0") or 0)
-        precio_venta = float(request.form.get("precio_venta", "0") or 0)
+        nombre = request.form["name"].strip()
+        categoria = request.form.get("category", "").strip()
+        precio_compra = float(request.form.get("sale_price", "0") or 0)
+        precio_venta = float(request.form.get("purchase_price", "0") or 0)
 
         db.execute("""
             UPDATE product
