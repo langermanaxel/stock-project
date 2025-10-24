@@ -10,6 +10,12 @@ csrf = CSRFProtect()
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
+    # Crear carpeta instance si no existe
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+    except OSError:
+        pass
+
     # -----------------------------
     # 🔧 Configuración base
     # -----------------------------
