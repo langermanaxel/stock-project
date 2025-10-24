@@ -4,6 +4,7 @@
 
 {% block content %}
 <form method="post" class="form-container">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="form-group">
     <label for="product_id">Producto</label>
     <select name="product_id" id="product_id" required>

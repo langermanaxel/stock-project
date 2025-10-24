@@ -19,10 +19,10 @@
     <tbody>
       {% for p in productos %}
       <tr>
-        <td>{{ p.nombre }}</td>
-        <td>{{ p.categoria }}</td>
-        <td>{{ p.stock_actual }}</td>
-        <td>${{ "%.2f"|format(p.precio_venta) }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.category }}</td>
+        <td>{{ p.current_stock }}</td>
+        <td>${{ "%.2f"|format(p.sale_price) }}</td>
       </tr>
       {% else %}
       <tr><td colspan="4">No hay productos cargados.</td></tr>
