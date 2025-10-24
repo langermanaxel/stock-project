@@ -107,21 +107,18 @@ sqlite3.register_converter("timestamp", lambda v: datetime.fromisoformat(v.decod
 
 
 def init_app(app):
-    # Cierra la conexión con la base de datos al finalizar el contexto
     app.teardown_appcontext(close_db)
-
-    # Comandos CLI (útiles en desarrollo local)
     app.cli.add_command(init_db_command)
     app.cli.add_command(create_admin_command)
 
-    # 🚀 Inicialización automática en Render (u otros entornos)
-    @app.before_first_request
-    def initialize_database():
+    # 🚀 Inicialización automática en Render (Flask 3.x compatible)
+    with app.app_context():
         db_path = app.config["DATABASE"]
         if not os.path.exists(db_path):
             try:
                 from flaskr.db import init_db
                 init_db()
-                print("🗄️ Base de datos inicializada automáticamente en Render.")
+                print("🗄️ Base de datos inicializada automáticamente en Render (Flask 3.x).")
             except Exception as e:
                 print(f"⚠️ Error al inicializar la base de datos: {e}")
+
