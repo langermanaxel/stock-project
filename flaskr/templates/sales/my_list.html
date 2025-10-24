@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Listado de ventas{% endblock %}
+{% block title %}Mis ventas{% endblock %}
 
 {% block header %}
-  <h1>Ventas registradas</h1>
+  <h1>Mis ventas</h1>
+  <a href="{{ url_for('sales.new') }}" class="btn">➕ Nueva venta</a>
 {% endblock %}
 
 {% block content %}
@@ -10,30 +11,26 @@
   <table class="table">
     <thead>
       <tr>
-        <th>ID</th>
         <th>Producto</th>
         <th>Cantidad</th>
         <th>Precio unitario</th>
         <th>Total</th>
         <th>Fecha</th>
-        <th>Vendido por</th>
       </tr>
     </thead>
     <tbody>
       {% for v in ventas %}
       <tr>
-        <td>{{ v['id'] }}</td>
         <td>{{ v['product_name'] }}</td>
         <td>{{ v['quantity'] }}</td>
         <td>${{ '%.2f'|format(v['unit_price']) }}</td>
         <td>${{ '%.2f'|format(v['total_price']) }}</td>
         <td>{{ v['sale_date'][:10] }}</td>
-        <td>{{ v['sold_by'] }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 {% else %}
-  <p>No hay ventas registradas.</p>
+  <p>No registraste ventas todavía.</p>
 {% endif %}
 {% endblock %}

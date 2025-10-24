@@ -1,17 +1,37 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block title %}Reportes{% endblock %}
 
 {% block header %}
-  <h1>Panel de Reportes</h1>
+  <h1>📈 Reportes del día</h1>
 {% endblock %}
 
 {% block content %}
-  <section>
-    <h2>Resumen general</h2>
-    <ul>
-      <li>Total de productos: {{ ventas_hoy }}</li>
-      <li>Total de ventas: {{ top5 }}</li>
-    </ul>
-  </section>
+  <div class="stats">
+    <p><strong>Ventas del día:</strong> ${{ '%.2f'|format(ventas_hoy or 0) }}</p>
+    <p><strong>Compras del día:</strong> ${{ '%.2f'|format(compras_hoy or 0) }}</p>
+  </div>
+
+  <h2>🏆 Productos más vendidos</h2>
+  {% if top5 %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad vendida</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in top5 %}
+          <tr>
+            <td>{{ item['product_name'] }}</td>
+            <td>{{ item['total_sold'] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No hay ventas registradas aún.</p>
+  {% endif %}
+
+  <a href="{{ url_for('users.admin_panel') }}" class="btn">⬅️ Volver al panel</a>
 {% endblock %}

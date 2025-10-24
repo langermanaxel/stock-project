@@ -1,37 +1,40 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block title %}Listado de compras{% endblock %}
+
 {% block header %}
-  <h1>Historial de compras</h1>
+  <h1>Compras registradas</h1>
+  <a href="{{ url_for('shopping.new') }}" class="btn">➕ Nueva compra</a>
 {% endblock %}
+
 {% block content %}
-  {% if compras %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Producto</th>
-          <th>Cantidad</th>
-          <th>Precio unitario</th>
-          <th>Total</th>
-          <th>Fecha</th>
-          <th>Registrado por</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in compras %}
-          <tr>
-            <td>{{ c.id }}</td>
-            <td>{{ c.product_name }}</td>
-            <td>{{ c.quantity }}</td>
-            <td>${{ "%.2f"|format(c.unit_price) }}</td>
-            <td>${{ "%.2f"|format(c.total_price) }}</td>
-            <td>{{ c.purchase_date[:10] }}</td>
-            <td>{{ c.created_by or "—" }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No hay compras registradas.</p>
-  {% endif %}
+{% if compras %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio unitario</th>
+        <th>Total</th>
+        <th>Fecha</th>
+        <th>Registrado por</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in compras %}
+      <tr>
+        <td>{{ c['id'] }}</td>
+        <td>{{ c['product_name'] }}</td>
+        <td>{{ c['quantity'] }}</td>
+        <td>${{ '%.2f'|format(c['unit_price']) }}</td>
+        <td>${{ '%.2f'|format(c['total_price']) }}</td>
+        <td>{{ c['purchase_date'][:10] }}</td>
+        <td>{{ c['created_by'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No hay compras registradas.</p>
+{% endif %}
 {% endblock %}

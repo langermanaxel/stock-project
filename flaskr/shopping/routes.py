@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for, flash, g
 from flaskr.security import roles_required
 from flaskr.db import get_db
 
@@ -44,3 +44,28 @@ def my_purchases():
         ORDER BY s.purchase_date DESC;
     """, (g.user["id"],)).fetchall()
     return render_template("shopping/my_list.html", compras=compras)
+
+@bp.route("/new", methods=["GET", "POST"])
+@roles_required("ADMIN")
+def new():
+    """Permite al ADMIN registrar una compra."""
+    db = get_db()
+    productos = db.execute("SELECT id, name FROM product ORDER BY name").fetchall()
+
+    if request.method == "POST":
+        product_id = request.form.get("product_id")
+        quantity = int(request.form.get("quantity", 0))
+        unit_price = float(request.form.get("unit_price", 0))
+
+        if not product_id or quantity <= 0 or unit_price <= 0:
+            flash("⚠️ Datos inválidos. Verificá los campos.", "warning")
+        else:
+            db.execute("""
+                INSERT INTO shopping (product_id, quantity, unit_price, created_by)
+                VALUES (?, ?, ?, ?)
+            """, (product_id, quantity, unit_price, g.user["id"]))
+            db.commit()
+            flash("✅ Compra registrada y stock actualizado.", "success")
+            return redirect(url_for("shopping.list"))
+
+    return render_template("shopping/form.html", productos=productos, mode="new")

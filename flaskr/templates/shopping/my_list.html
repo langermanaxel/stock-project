@@ -1,5 +1,4 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block title %}Mis compras{% endblock %}
 
 {% block header %}
@@ -7,32 +6,30 @@
 {% endblock %}
 
 {% block content %}
-  {% if compras %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Producto</th>
-          <th>Cantidad</th>
-          <th>Precio unitario</th>
-          <th>Total</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in compras %}
-          <tr>
-            <td>{{ c.id }}</td>
-            <td>{{ c.product_name }}</td>
-            <td>{{ c.quantity }}</td>
-            <td>${{ "%.2f"|format(c.unit_price) }}</td>
-            <td>${{ "%.2f"|format(c.total_price) }}</td>
-            <td>{{ c.purchase_date[:10] }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No registraste compras todavía.</p>
-  {% endif %}
+{% if compras %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio unitario</th>
+        <th>Total</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in compras %}
+      <tr>
+        <td>{{ c['product_name'] }}</td>
+        <td>{{ c['quantity'] }}</td>
+        <td>${{ '%.2f'|format(c['unit_price']) }}</td>
+        <td>${{ '%.2f'|format(c['total_price']) }}</td>
+        <td>{{ c['purchase_date'][:10] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No registraste compras todavía.</p>
+{% endif %}
 {% endblock %}

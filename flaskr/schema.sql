@@ -119,3 +119,60 @@ BEGIN
       updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
   WHERE id = NEW.product_id;
 END;
+
+-- =====================================================
+-- Tabla: sales (ventas)
+-- =====================================================
+
+DROP TABLE IF EXISTS sales;
+
+CREATE TABLE sales (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+  -- 🔗 Relación con producto
+  product_id INTEGER NOT NULL,
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+
+  -- 💰 Datos económicos
+  unit_price REAL NOT NULL CHECK (unit_price >= 0),
+  total_price REAL GENERATED ALWAYS AS (quantity * unit_price) STORED,
+
+  -- 📅 Fechas
+  sale_date TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+
+  -- 👤 Usuario que registró la venta
+  created_by INTEGER NOT NULL,
+
+  -- 🔗 Claves foráneas
+  FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE SET NULL
+);
+
+-- Índices útiles
+CREATE INDEX IF NOT EXISTS idx_sales_product_id ON sales(product_id);
+CREATE INDEX IF NOT EXISTS idx_sales_created_by ON sales(created_by);
+CREATE INDEX IF NOT EXISTS idx_sales_sale_date ON sales(sale_date);
+
+-- 🔁 Trigger: reducir stock al registrar una venta
+CREATE TRIGGER IF NOT EXISTS trg_sales_after_insert
+AFTER INSERT ON sales
+FOR EACH ROW
+BEGIN
+  UPDATE product
+  SET current_stock = current_stock - NEW.quantity,
+      updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+  WHERE id = NEW.product_id;
+END;
+
+-- 🔁 Trigger: restaurar stock si se elimina una venta
+CREATE TRIGGER IF NOT EXISTS trg_sales_after_delete
+AFTER DELETE ON sales
+FOR EACH ROW
+BEGIN
+  UPDATE product
+  SET current_stock = current_stock + OLD.quantity,
+      updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+  WHERE id = OLD.product_id;
+END;
