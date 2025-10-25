@@ -113,6 +113,13 @@ def create_app(test_config=None):
         else:
             # Sesión expirada o inválida → redirigir al login
             return redirect(url_for("auth.login"))
+        
+    # -----------------------------
+    # 👑 Crear usuario ADMIN por defecto (si no existe)
+    # -----------------------------
+    with app.app_context():
+        from .db import ensure_admin
+        ensure_admin()
 
     # -----------------------------
     # ✅ Retornar la app configurada

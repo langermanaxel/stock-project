@@ -122,3 +122,19 @@ def init_app(app):
             except Exception as e:
                 print(f"⚠️ Error al inicializar la base de datos: {e}")
 
+def ensure_admin():
+    db = get_db()
+    admin_email = "admin@example.com"
+    existing = db.execute("SELECT id FROM user WHERE email = ?", (admin_email,)).fetchone()
+    if not existing:
+        db.execute(
+            """
+            INSERT INTO user (firstname, lastname, email, username, password_hash, role)
+            VALUES (?, ?, ?, ?, ?, 'ADMIN');
+            """,
+            ("Admin", "Root", admin_email, "admin", generate_password_hash("admin123")),
+        )
+        db.commit()
+        print("✅ Admin creado por defecto: admin@example.com / admin123")
+    else:
+        print("ℹ️ Admin ya existente, no se crea otro.")
